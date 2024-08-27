@@ -26,7 +26,9 @@ class DaoVenda:
         with open('arquivos/vendas.txt', 'a') as arq:
             arq.writelines(venda.itensVendidos.nome + '|' + 
                            str(venda.itensVendidos.preco) + '|' +  
+                           venda.itensVendidos.categoria + '|' + 
                            venda.vendedor + '|' + 
+                           venda.comprador + '|' + 
                            str(venda.quantidadeVendida) + '|' + 
                            venda.data)
             arq.writelines('\n')
@@ -40,7 +42,7 @@ class DaoVenda:
 
         vend = []
         for i in cls.venda:
-            vend.append(Venda(Produtos(i[0], i[1], i[2], i[3], i[4], i[5], i[6])))
+            vend.append(Venda(Produtos(i[0], i[1], i[2]), i[3], i[4], i[5], i[6]))
         
         return vend
 
@@ -97,7 +99,7 @@ class DaoFornecedor:
 class DaoPessoa:
     @classmethod
     def salvar(cls, pessoa: Pessoa):
-        with open('arquivos/pessoas.txt', 'a') as arq:
+        with open('arquivos/clientes.txt', 'a') as arq:
             arq.writelines(pessoa.nome + '|' + 
                            pessoa.telefone + '|' + 
                            pessoa.cpf + '|' + 
@@ -106,7 +108,7 @@ class DaoPessoa:
             arq.writelines('\n')
     @classmethod
     def ler(cls):
-        with open('arquivos/pessoas.txt', 'r') as arq:
+        with open('arquivos/clientes.txt', 'r') as arq:
             cls.pessoa = arq.readlines()
         
         cls.pessoa = list(map(lambda x: x.replace('\n', ''), cls.pessoa))

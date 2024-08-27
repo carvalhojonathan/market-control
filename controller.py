@@ -1,6 +1,6 @@
 from models import *
 from dao import *
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class ControllerCategoria:
     def cadastrarCategoria(self, novaCategoria):
@@ -130,14 +130,14 @@ class ControllerEstoque:
                 print('-------------------')
 
 class ControllerVenda:
-    def realizarVenda(self, nomeProduto, vendedor = 'admin', comprador = 'não identificado', quantidadeVendida = 1):
+    def realizarVenda(self, nomeProduto, vendedor = 'admin', comprador = 'nao identificado', quantidadeVendida = 1):
         x = DaoEstoque.ler()
         prod = list(filter(lambda x: x.produto.nome == nomeProduto, x))
         if len(prod) > 0:
             for i in prod:
                 if i.quantidade >= quantidadeVendida:
                     i.quantidade -= quantidadeVendida
-                    vendido = Venda(i.produto, vendedor, comprador, quantidadeVendida)
+                    vendido = Venda(Produtos(i.produto.nome, i.produto.preco, i.produto.categoria), vendedor, comprador, quantidadeVendida)
                     DaoVenda.salvar(vendido)
                     valorCompra = quantidadeVendida * int(i.produto.preco)
                     print('---------------------------')
@@ -168,8 +168,242 @@ class ControllerVenda:
             print(f'O produto {nomeProduto} não existe no estoque!')
             print('---------------------------')
 
-# a = ControllerEstoque()
-# a.cadastrarProduto('Uva', '2', 'Frutas', 10)
+    def relatorioVendas(self):
+        vendas = DaoVenda.ler()
+        produtos = []
+        for i in vendas:
+            nome = i.itensVendidos.nome
+            quantidade = int(i.quantidadeVendida)
+            tamanho = list(filter(lambda x: x['produto'] == nome, produtos))
+            if len(tamanho) > 0:
+                produtos = list(map(lambda x: {'produto': nome, 'quantidade': x['quantidade']+quantidade} 
+                                    if x['produto'] == nome else (x), produtos))
+            else:
+                produtos.append({'produto': nome, 'quantidade': quantidade})
+            
+            produtosOrdernados = sorted(produtos, key = lambda x: x['quantidade'], reverse = True)
+        print('---------------------------')
+        print('--- RELATÓRIO DE VENDAS ---')
+        print('---------------------------')
+        print(f'{"#. Produto":<10}    | {"Quantidade":>10}')
+        print('---------------------------')
+        for i, produto in enumerate(produtosOrdernados, start=1):
+            print(f'{i}. {produto["produto"]:<10} | {produto["quantidade"]:>10}')
+        print('---------------------------')
 
-a = ControllerVenda()
-a.realizarVenda('Uva')
+    def visualizarVendas(self, dataInicial = (datetime.now() - timedelta(days=30)).strftime('%d/%m/%Y'), dataFinal = datetime.now().strftime('%d/%m/%Y')):
+        vendas = DaoVenda.ler()
+        dataInicial1 = datetime.strptime(dataInicial, '%d/%m/%Y')
+        dataFinal1 = datetime.strptime(dataFinal, '%d/%m/%Y')
+
+        vendasSelecionadas = list(filter(lambda x: datetime.strptime(x.data, '%d/%m/%Y') >= dataInicial1 
+                                         and datetime.strptime(x.data, '%d/%m/%Y') <= dataFinal1, vendas))
+        
+        for i, venda in enumerate(vendasSelecionadas, start=1):
+            print('---------------------------')
+            print(f'Venda nº {i}')
+            print('---------------------------')
+            print(f'Produto: {venda.itensVendidos.nome}')
+            print(f'Vendedor: {venda.vendedor}')
+            print(f'Comprador: {venda.comprador}')
+            print(f'Quantidade: {venda.quantidadeVendida}')
+            print(f'Valor: R$ {int(venda.itensVendidos.preco) * int(venda.quantidadeVendida)}')
+            print(f'Data: {venda.data}')
+        print('---------------------------')
+        print(f'TOTAL VENDIDO: R$ {sum([int(venda.itensVendidos.preco) * int(venda.quantidadeVendida) for venda in vendasSelecionadas])}')
+        print('---------------------------')
+
+class ControllerFornecedor:
+    def cadastrarFornecedor(self, nome, cnpj, telefone, categoria):
+        x = DaoFornecedor.ler()
+        listaCnpj = list(filter(lambda x: x.cnpj == cnpj, x))
+        listaTelefone = list(filter(lambda x: x.telefone == telefone, x))
+        if len(listaCnpj) > 0:
+            print('Já existe um fornecedor com este CNPJ!')
+        elif len(listaTelefone) > 0:
+            print('Já existe um fornecedor com este telefone!')
+        else:
+            if len(cnpj) == 14 and len(telefone) <= 11 and len(telefone) >= 10:
+                fornecedor = Fornecedor(nome, cnpj, telefone, categoria)
+                DaoFornecedor.salvar(fornecedor)
+                print('Fornecedor cadastrado com sucesso!')
+            else:
+                print('CNPJ ou telefone inválido!')
+    
+    def alterarFornecedor(self, cnpjAtual, novoCnpj, novoNome, novoTelefone, novaCategoria):
+        x = DaoFornecedor.ler()
+        listaCnpj = list(filter(lambda x: x.cnpj == cnpjAtual, x))
+        if len(listaCnpj) > 0:
+            forn = list(filter(lambda x: x.cnpj == novoCnpj, x))
+            if len(forn) == 0:
+                x = list(map(lambda x: Fornecedor(novoNome, novoCnpj, novoTelefone, novaCategoria) 
+                             if (x.cnpj == cnpjAtual) else (x), x))
+                print('Fornecedor alterado com sucesso!')
+                with open('arquivos/fornecedores.txt', 'w') as arq:
+                    for i in x:
+                        arq.writelines(i.nome + '|' + i.cnpj + '|' + i.telefone + '|' + i.categoria + '\n')
+            else:
+                print('Já existe um fornecedor com este CNPJ!')
+        else:
+            print('Fornecedor não encontrado!')
+
+    def removerFornecedor(self, cnpj):
+        x = DaoFornecedor.ler()
+        forn = list(filter(lambda x: x.cnpj == cnpj, x))
+        if len(forn) > 0:
+            for i in range(len(x)):
+                if x[i].cnpj == cnpj:
+                    del x[i]
+                    break
+            print('Fornecedor removido com sucesso!')
+            with open('arquivos/fornecedores.txt', 'w') as arq:
+                for i in x:
+                    arq.writelines(i.nome + '|' + i.cnpj + '|' + i.telefone + '|' + i.categoria + '\n')
+        else:
+            print('Fornecedor não encontrado!')
+
+    def visualizarFornecedores(self):
+        x = DaoFornecedor.ler()
+        if len(x) == 0:
+            print('Nenhum fornecedor cadastrado!')
+        else:
+            print('--------------------')
+            print('--- FORNECEDORES ---')
+            print('--------------------')
+            for i in x:
+                print(f'Nome: {i.nome}')
+                print(f'CNPJ: {i.cnpj}')
+                print(f'Telefone: {i.telefone}')
+                print(f'Categoria: {i.categoria}')
+                print('--------------------')
+
+class ControllerCliente:
+    def cadastrarClientes(self, nome, telefone, cpf, email, endereco):
+        x = DaoPessoa.ler()
+        listaCpf = list(filter(lambda x: x.cpf == cpf, x))
+        if len(listaCpf) > 0:
+            print('Já existe um cliente com este CPF!')
+        else:
+            if len(cpf) == 11 and len(telefone) <= 11 and len(telefone) >= 10:
+                cliente = Pessoa(nome, telefone, cpf, email, endereco)
+                if cliente in x:
+                    print('Já existe um cliente com este CPF!')
+                else:
+                    DaoPessoa.salvar(cliente)
+                    print('Cliente cadastrado com sucesso!')
+            else:
+                print('CPF ou telefone inválido!')
+    
+    def alterarClientes(self, cpfAtual, novoCpf, novoNome, novoTelefone, novoEmail, novoEndereco):
+        x = DaoPessoa.ler()
+        listaCpf = list(filter(lambda x: x.cpf == cpfAtual, x))
+        if len(listaCpf) > 0:
+            cli = list(filter(lambda x: x.cpf == novoCpf, x))
+            if len(cli) == 0:
+                x = list(map(lambda x: Pessoa(novoNome, novoTelefone, novoCpf, novoEmail, novoEndereco) 
+                             if (x.cpf == cpfAtual) else (x), x))
+                print('Cliente alterado com sucesso!')
+                with open('arquivos/clientes.txt', 'w') as arq:
+                    for i in x:
+                        arq.writelines(i.nome + '|' + i.telefone + '|' + i.cpf + '|' + i.email + '|' + i.endereco + '\n')
+            else:
+                print('Já existe um cliente com este CPF!')
+        else:
+            print('Cliente não encontrado!')
+
+    def removerClientes(self, cpf):
+        x = DaoPessoa.ler()
+        cli = list(filter(lambda x: x.cpf == cpf, x))
+        if len(cli) > 0:
+            for i in range(len(x)):
+                if x[i].cpf == cpf:
+                    del x[i]
+                    break
+            print(f'Cliente `{cli[0].nome}´ removido com sucesso!')
+            with open('arquivos/clientes.txt', 'w') as arq:
+                for i in x:
+                    arq.writelines(i.nome + '|' + i.telefone + '|' + i.cpf + '|' + i.email + '|' + i.endereco + '\n')
+        else:
+            print('Cliente não encontrado!')
+
+    def visualizarClientes(self):
+        x = DaoPessoa.ler()
+        if len(x) == 0:
+            print('Nenhum cliente cadastrado!')
+        else:
+            print('-------------------')
+            print('---- CLIENTES ----')
+            print('-------------------')
+            for i in x:
+                print(f'Nome: {i.nome}')
+                print(f'CPF: {i.cpf}')
+                print(f'Telefone: {i.telefone}')
+                print(f'Email: {i.email}')
+                print(f'Endereço: {i.endereco}')
+                print('-------------------')
+
+class ControllerFuncionario:
+    def cadastrarFuncionario(self, clt, nome, telefone, cpf, email, endereco):
+        x = DaoFuncionario.ler()
+        listaCpf = list(filter(lambda x: x.cpf == cpf, x))
+        listaClt = list(filter(lambda x: x.clt == clt, x))
+        if len(listaCpf) > 0:
+            print('Já existe um funcionário com este CPF!')
+        elif len(listaClt) > 0:
+            print('Já existe um funcionário com esta CLT!')
+        else:
+            if len(cpf) == 11 and len(telefone) <= 11 and len(telefone) >= 10:
+                funcionario = Funcionario(clt, nome, telefone, cpf, email, endereco)
+                DaoFuncionario.salvar(funcionario)
+                print('Funcionário cadastrado com sucesso!')
+            else:
+                print('CPF ou telefone inválido!')
+    
+    def alterarFuncionario (self, nomeAtual, novoClt, novoNome, novoTelefone, novoCpf, novoEmail, novoEndereco):
+        x = DaoFuncionario.ler()
+        busca = list(filter(lambda x: x.nome == nomeAtual, x))
+        if len(busca) > 0:
+            func = list(filter(lambda x: x.clt == novoClt, x))
+            if len(func) == 0:
+                x = list(map(lambda x: Funcionario(novoClt, novoNome, novoTelefone, novoCpf, novoEmail, novoEndereco) 
+                             if (x.nome == nomeAtual) else (x), x))
+                print('Funcionário alterado com sucesso!')
+                with open('arquivos/funcionarios.txt', 'w') as arq:
+                    for i in x:
+                        arq.writelines(i.clt + '|' + i.nome + '|' + i.telefone + '|' + i.cpf + '|' + i.email + '|' + i.endereco + '\n')
+            else:
+                print('Já existe um funcionário com esta CLT!')
+        else:
+            print('Funcionário não encontrado!')
+
+    def removerFuncionario(self, nome):
+        x = DaoFuncionario.ler()
+        func = list(filter(lambda x: x.nome == nome, x))
+        if len(func) > 0:
+            for i in range(len(x)):
+                if x[i].nome == nome:
+                    del x[i]
+                    break
+            print(f'Funcionário `{func[0].nome}´ removido com sucesso!')
+            with open('arquivos/funcionarios.txt', 'w') as arq:
+                for i in x:
+                    arq.writelines(i.clt + '|' + i.nome + '|' + i.telefone + '|' + i.cpf + '|' + i.email + '|' + i.endereco + '\n')
+        else:
+            print('Funcionário não encontrado!')
+
+    def visualizarFuncionarios(self):
+        x = DaoFuncionario.ler()
+        if len(x) == 0:
+            print('Nenhum funcionário cadastrado!')
+        else:
+            print('-------------------')
+            print('--- FUNCIONÁRIOS ---')
+            print('-------------------')
+            for i in x:
+                print(f'CLT: {i.clt}')
+                print(f'Nome: {i.nome}')
+                print(f'Telefone: {i.telefone}')
+                print(f'CPF: {i.cpf}')
+                print(f'Email: {i.email}')
+                print(f'Endereço: {i.endereco}')
+                print('-------------------')
