@@ -38,4 +38,6 @@ O **Market Control** é um sistema desenvolvido para auxiliar no gerenciamento d
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [`LICENSE`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FD%3A%2FUsers%2Fjonat%2FDocuments%2FGitHub%2Fmarket-control%2FLICENSE%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%5D "d:\Users\jonat\Documents\GitHub\market-control\LICENSE") para mais detalhes.
 
-Feito por Jonathan Carvalho
+
+_____________________________
+Feito por @carvalhojonathan
