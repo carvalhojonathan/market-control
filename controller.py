@@ -88,3 +88,88 @@ class ControllerEstoque:
                                     str(i.quantidade) + '\n')
         else:
             print(f'O produto não existe!')
+
+    def alterarProduto(self, nome, novoNome, novoPreco, novaCategoria, novaQuantidade):
+        x = DaoEstoque.ler()
+        y = DaoCategoria.ler()
+        prod = list(filter(lambda x: x.produto.nome == nome, x))
+        cat = list(filter(lambda x: x.categoria == novaCategoria, y))
+
+        if len(cat) > 0:
+            if len(prod) > 0:
+                est = list(filter(lambda x: x.produto.nome == novoNome, x))
+                if len(est) == 0:
+                    x = list(map(lambda x: Estoque(Produtos(novoNome, novoPreco, novaCategoria), novaQuantidade) if (x.produto.nome == nome) else (x), x))
+                    print(f'Produto ´{nome}` alterado para ´{novoNome}` com sucesso!')
+                    with open('arquivos/estoque.txt', 'w') as arq:
+                        for i in x:
+                            arq.writelines(i.produto.nome + '|' + 
+                                            str(i.produto.preco) + '|' + 
+                                            i.produto.categoria + '|' + 
+                                            str(i.quantidade) + '\n')
+                else:
+                    print(f'Já existe um produto chamado ´{novoNome}`')
+            else:
+                print(f'O produto ´{nome}` não existe!')
+        else:
+            print(f'A categoria não existe!')
+
+    def listarProdutos(self):
+        x = DaoEstoque.ler()
+        if len(x) == 0:
+            print('Nenhum produto cadastrado!')
+        else:
+            print('-------------------')
+            print(f'----- ESTOQUE -----')
+            print('-------------------')
+            for i in x:
+                print(f'Nome: {i.produto.nome}')
+                print(f'Preço: R$ {i.produto.preco}')
+                print(f'Categoria: {i.produto.categoria}')
+                print(f'Quantidade: {i.quantidade}')
+                print('-------------------')
+
+class ControllerVenda:
+    def realizarVenda(self, nomeProduto, vendedor = 'admin', comprador = 'não identificado', quantidadeVendida = 1):
+        x = DaoEstoque.ler()
+        prod = list(filter(lambda x: x.produto.nome == nomeProduto, x))
+        if len(prod) > 0:
+            for i in prod:
+                if i.quantidade >= quantidadeVendida:
+                    i.quantidade -= quantidadeVendida
+                    vendido = Venda(i.produto, vendedor, comprador, quantidadeVendida)
+                    DaoVenda.salvar(vendido)
+                    valorCompra = quantidadeVendida * int(i.produto.preco)
+                    print('---------------------------')
+                    print(f'Venda realizada com sucesso!')
+                    print('---------------------------')
+                    print(f'Produto: {i.produto.nome}')
+                    print(f'Valor unitário: R$ {i.produto.preco}')
+                    print(f'Quantidade: {quantidadeVendida}')
+                    print(f'Valor total: R$ {valorCompra}')
+                    print('---------------------------')
+                    with open('arquivos/estoque.txt', 'w') as arq:
+                        for item in x:
+                            arq.writelines(item.produto.nome + '|' + 
+                                           str(item.produto.preco) + '|' + 
+                                           item.produto.categoria + '|' + 
+                                           str(item.quantidade) + '\n')
+                    break
+                else:
+                    print('---------------------------')
+                    print(f'Quantidade insuficiente no estoque!')
+                    print('---------------------------')
+                    print(f'Produto: {i.produto.nome}')
+                    print(f'Estoque disponível: {i.quantidade}')
+                    print(f'Quantidade solicitada: {quantidadeVendida}')
+                    print('---------------------------')
+        else:
+            print('---------------------------')
+            print(f'O produto {nomeProduto} não existe no estoque!')
+            print('---------------------------')
+
+# a = ControllerEstoque()
+# a.cadastrarProduto('Uva', '2', 'Frutas', 10)
+
+a = ControllerVenda()
+a.realizarVenda('Uva')
