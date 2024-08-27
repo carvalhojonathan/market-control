@@ -200,14 +200,17 @@ class ControllerVenda:
             else:
                 produtos.append({'produto': nome, 'quantidade': quantidade})
             
-            produtosOrdernados = sorted(produtos, key = lambda x: x['quantidade'], reverse = True)
+        produtosOrdernados = sorted(produtos, key = lambda x: x['quantidade'], reverse = True)
         print('---------------------------')
         print('--- RELATÓRIO DE VENDAS ---')
         print('---------------------------')
         print(f'{"#. Produto":<10}    | {"Quantidade":>10}')
         print('---------------------------')
-        for i, produto in enumerate(produtosOrdernados, start=1):
-            print(f'{i}. {produto["produto"]:<10} | {produto["quantidade"]:>10}')
+        if produtosOrdernados == []:
+            print('Nenhuma venda realizada!')
+        else:
+            for i, produto in enumerate(produtosOrdernados, start=1):
+                print(f'{i}. {produto["produto"]:<10} | {produto["quantidade"]:>10}')
         print('---------------------------')
 
     def visualizarVendas(self, dataInicial = (datetime.now() - timedelta(days=30)).strftime('%d/%m/%Y'), dataFinal = datetime.now().strftime('%d/%m/%Y')):
