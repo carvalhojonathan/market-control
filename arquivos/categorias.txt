@@ -1,0 +1,4 @@
+Frutas
+Carnes
+Legumes
+Alimentos
