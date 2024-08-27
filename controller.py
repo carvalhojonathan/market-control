@@ -27,9 +27,18 @@ class ControllerCategoria:
                    del x[i]
                    break
             print(f'Categoria `{categoriaRemover}´ removida com sucesso!')
-    #TODO: COLOCAR SEM CATEGORIA NO ESTOQUE
             with open('arquivos/categorias.txt', 'w') as arq:
                 [arq.write(f'{i.categoria}\n') for i in x]
+
+        estoque = DaoEstoque.ler()
+        estoque = list(map(lambda x: Estoque(Produtos(x.produto.nome, x.produto.preco, 'Sem categoria'), x.quantidade) 
+                           if (x.produto.categoria == categoriaRemover) else (x), estoque))
+        with open('arquivos/estoque.txt', 'w') as arq:
+            for i in estoque:
+                arq.writelines(i.produto.nome + '|' + 
+                               str(i.produto.preco) + '|' + 
+                               i.produto.categoria + '|' + 
+                               str(i.quantidade) + '\n')
 
     def alterarCategoria(self, categoriaAtual, novaCategoria):
         x = DaoCategoria.ler()
@@ -42,7 +51,17 @@ class ControllerCategoria:
             else:
                 x = list(map(lambda x: Categoria(novaCategoria) if (x.categoria == categoriaAtual) else (x), x))
                 print(f'A categoria `{categoriaAtual}´ foi alterada para `{novaCategoria}´ com sucesso!')
-                #TODO: COLOCAR SEM CATEGORIA TAMBÉM NO ESTOQUE
+
+                estoque = DaoEstoque.ler()
+                estoque = list(map(lambda x: Estoque(Produtos(x.produto.nome, x.produto.preco, 'Categoria alterada'), x.quantidade) 
+                                   if (x.produto.categoria == categoriaAtual) else (x), estoque))
+                with open('arquivos/estoque.txt', 'w') as arq:
+                    for i in estoque:
+                        arq.writelines(i.produto.nome + '|' + 
+                                    str(i.produto.preco) + '|' + 
+                                    i.produto.categoria + '|' + 
+                                    str(i.quantidade) + '\n')
+
                 with open('arquivos/categorias.txt', 'w') as arq:
                     [arq.writelines(f'{i.categoria}\n') for i in x]
         else:
@@ -407,3 +426,4 @@ class ControllerFuncionario:
                 print(f'Email: {i.email}')
                 print(f'Endereço: {i.endereco}')
                 print('-------------------')
+

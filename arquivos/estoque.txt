@@ -1,1 +1,3 @@
-
+Arroz|10|Alimentos|100
+Feij�o|15|Alimentos|100
+Frango|17|Categoria alterada|100
