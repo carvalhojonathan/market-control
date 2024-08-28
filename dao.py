@@ -1,6 +1,18 @@
 from models import *
 
 class DaoCategoria:
+    """
+    Classe de acesso a dados para a entidade Categoria.
+
+    Métodos:
+    --------
+    salvar(cls, categoria):
+        Salva uma nova categoria no arquivo 'categorias.txt'.
+    
+    ler(cls):
+        Lê todas as categorias do arquivo 'categorias.txt' e retorna uma lista de objetos Categoria.
+    """
+
     @classmethod
     def salvar(cls, categoria):
         with open('arquivos/categorias.txt', 'a') as arq:
@@ -21,6 +33,18 @@ class DaoCategoria:
         return cat
 
 class DaoVenda:
+    """
+    Classe de acesso a dados para a entidade Venda.
+
+    Métodos:
+    --------
+    salvar(cls, venda):
+        Salva uma nova venda no arquivo 'vendas.txt'.
+    
+    ler(cls):
+        Lê todas as vendas do arquivo 'vendas.txt' e retorna uma lista de objetos Venda.
+    """
+
     @classmethod
     def salvar(cls, venda):
         with open('arquivos/vendas.txt', 'a') as arq:
@@ -32,6 +56,7 @@ class DaoVenda:
                            str(venda.quantidadeVendida) + '|' + 
                            venda.data)
             arq.writelines('\n')
+    
     @classmethod
     def ler(cls):
         with open('arquivos/vendas.txt', 'r') as arq:
@@ -47,6 +72,18 @@ class DaoVenda:
         return vend
 
 class DaoEstoque:
+    """
+    Classe de acesso a dados para a entidade Estoque.
+
+    Métodos:
+    --------
+    salvar(cls, produto, quantidade):
+        Salva um novo item de estoque no arquivo 'estoque.txt'.
+    
+    ler(cls):
+        Lê todos os itens de estoque do arquivo 'estoque.txt' e retorna uma lista de objetos Estoque.
+    """
+
     @classmethod
     def salvar(cls, produto: Produtos, quantidade):
         with open('arquivos/estoque.txt', 'a') as arq:
@@ -74,6 +111,18 @@ class DaoEstoque:
         return est
     
 class DaoFornecedor:
+    """
+    Classe de acesso a dados para a entidade Fornecedor.
+
+    Métodos:
+    --------
+    salvar(cls, fornecedor):
+        Salva um novo fornecedor no arquivo 'fornecedores.txt'.
+    
+    ler(cls):
+        Lê todos os fornecedores do arquivo 'fornecedores.txt' e retorna uma lista de objetos Fornecedor.
+    """
+
     @classmethod
     def salvar(cls, fornecedor: Fornecedor):
         with open('arquivos/fornecedores.txt', 'a') as arq:
@@ -82,6 +131,7 @@ class DaoFornecedor:
                            fornecedor.telefone + '|' + 
                            fornecedor.categoria)
             arq.writelines('\n')
+    
     @classmethod
     def ler(cls):
         with open('arquivos/fornecedores.txt', 'r') as arq:
@@ -97,6 +147,18 @@ class DaoFornecedor:
         return forn
     
 class DaoPessoa:
+    """
+    Classe de acesso a dados para a entidade Pessoa.
+
+    Métodos:
+    --------
+    salvar(cls, pessoa):
+        Salva uma nova pessoa no arquivo 'clientes.txt'.
+    
+    ler(cls):
+        Lê todas as pessoas do arquivo 'clientes.txt' e retorna uma lista de objetos Pessoa.
+    """
+
     @classmethod
     def salvar(cls, pessoa: Pessoa):
         with open('arquivos/clientes.txt', 'a') as arq:
@@ -106,6 +168,7 @@ class DaoPessoa:
                            pessoa.email + '|' + 
                            pessoa.endereco)
             arq.writelines('\n')
+    
     @classmethod
     def ler(cls):
         with open('arquivos/clientes.txt', 'r') as arq:
@@ -121,6 +184,18 @@ class DaoPessoa:
         return pes
 
 class DaoFuncionario:
+    """
+    Classe de acesso a dados para a entidade Funcionario.
+
+    Métodos:
+    --------
+    salvar(cls, funcionario):
+        Salva um novo funcionário no arquivo 'funcionarios.txt'.
+    
+    ler(cls):
+        Lê todos os funcionários do arquivo 'funcionarios.txt' e retorna uma lista de objetos Funcionario.
+    """
+
     @classmethod
     def salvar(cls, funcionario: Funcionario):
         with open('arquivos/funcionarios.txt', 'a') as arq:
@@ -131,6 +206,7 @@ class DaoFuncionario:
                            funcionario.email + '|' + 
                            funcionario.endereco)
             arq.writelines('\n')
+    
     @classmethod
     def ler(cls):
         with open('arquivos/funcionarios.txt', 'r') as arq:

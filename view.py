@@ -2,6 +2,16 @@ import os
 import controller
 
 def criar_arquivos(*args):
+    """
+    Cria arquivos de texto vazios para armazenar os dados do sistema.
+    Verifica se o diretório 'arquivos' existe e, caso não exista, o cria.
+    Em seguida, itera sobre os argumentos fornecidos e verifica se cada arquivo já existe.
+    Se o arquivo não existir, ele é criado com conteúdo vazio.
+    ----------------------------------------
+    Parâmetros:
+    *args: str
+        Nomes dos arquivos a serem criados.
+    """
     if not os.path.exists('arquivos'):
         os.makedirs('arquivos')
 
@@ -29,6 +39,7 @@ if __name__ == "__main__":
                                     'Digite 7 para acessar [+ Vendidos]\n'
                                     'Digite 0 para [sair]\n'
                                     '===================================\n'))
+        
         if menu_principal == 1:
             cat = controller.ControllerCategoria()
             while True:

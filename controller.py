@@ -3,6 +3,14 @@ from dao import *
 from datetime import datetime, timedelta
 
 class ControllerCategoria:
+    """
+    Classe responsável por controlar as operações relacionadas às categorias.
+    Métodos:
+    - cadastrarCategoria(novaCategoria): Cadastra uma nova categoria.
+    - removerCategoria(categoriaRemover): Remove uma categoria existente.
+    - alterarCategoria(categoriaAtual, novaCategoria): Altera o nome de uma categoria existente.
+    - listarCategorias(): Lista todas as categorias cadastradas.
+    """
     def cadastrarCategoria(self, novaCategoria):
         existe = False
         x = DaoCategoria.ler()
@@ -75,6 +83,14 @@ class ControllerCategoria:
             [print(f'Categoria: {i.categoria}') for i in x]
 
 class ControllerEstoque:
+    """
+    Classe responsável por controlar o estoque de produtos.
+    Métodos:
+    - cadastrarProduto(nome, preco, categoria, quantidade): Cadastra um novo produto no estoque.
+    - removerProduto(nome): Remove um produto do estoque.
+    - alterarProduto(nome, novoNome, novoPreco, novaCategoria, novaQuantidade): Altera as informações de um produto no estoque.
+    - listarProdutos(): Lista todos os produtos cadastrados no estoque.
+    """
     def cadastrarProduto(self, nome, preco, categoria, quantidade):
         x = DaoEstoque.ler()
         y = DaoCategoria.ler()
@@ -149,6 +165,13 @@ class ControllerEstoque:
                 print('-------------------')
 
 class ControllerVenda:
+    """
+    Classe responsável por controlar as vendas e gerar relatórios.
+    Métodos:
+    - realizarVenda: Realiza uma venda de um produto específico.
+    - relatorioVendas: Gera um relatório de vendas, mostrando a quantidade vendida de cada produto.
+    - visualizarVendas: Visualiza as vendas realizadas em um período de tempo específico.
+    """
     def realizarVenda(self, nomeProduto, vendedor = 'admin', comprador = 'nao identificado', quantidadeVendida = 1):
         x = DaoEstoque.ler()
         prod = list(filter(lambda x: x.produto.nome == nomeProduto, x))
@@ -236,6 +259,14 @@ class ControllerVenda:
         print('---------------------------')
 
 class ControllerFornecedor:
+    """
+    Classe responsável por controlar as operações relacionadas aos fornecedores.
+    Métodos:
+    - cadastrarFornecedor: cadastra um novo fornecedor.
+    - alterarFornecedor: altera os dados de um fornecedor existente.
+    - removerFornecedor: remove um fornecedor existente.
+    - visualizarFornecedores: exibe os fornecedores cadastrados.
+    """
     def cadastrarFornecedor(self, nome, cnpj, telefone, categoria):
         x = DaoFornecedor.ler()
         listaCnpj = list(filter(lambda x: x.cnpj == cnpj, x))
@@ -300,6 +331,14 @@ class ControllerFornecedor:
                 print('--------------------')
 
 class ControllerCliente:
+    """
+    Classe responsável por controlar as operações relacionadas aos clientes.
+    Métodos:
+    - cadastrarClientes(nome, telefone, cpf, email, endereco): Cadastra um novo cliente.
+    - alterarClientes(cpfAtual, novoCpf, novoNome, novoTelefone, novoEmail, novoEndereco): Altera os dados de um cliente existente buscando pelo CPF.
+    - removerClientes(cpf): Remove um cliente buscando pelo CPF.
+    - visualizarClientes(): Exibe todos os clientes cadastrados.
+    """
     def cadastrarClientes(self, nome, telefone, cpf, email, endereco):
         x = DaoPessoa.ler()
         listaCpf = list(filter(lambda x: x.cpf == cpf, x))
@@ -365,6 +404,14 @@ class ControllerCliente:
                 print('-------------------')
 
 class ControllerFuncionario:
+    """
+    Classe responsável por controlar as operações relacionadas aos funcionários.
+    Métodos:
+    - cadastrarFuncionario(clt, nome, telefone, cpf, email, endereco): Cadastra um novo funcionário.
+    - alterarFuncionario(nomeAtual, novoClt, novoNome, novoTelefone, novoCpf, novoEmail, novoEndereco): Altera os dados de um funcionário existente buscando pelo nome.
+    - removerFuncionario(nome): Remove um funcionário existente buscando pelo nome.
+    - visualizarFuncionarios(): Exibe a lista de funcionários cadastrados.
+    """
     def cadastrarFuncionario(self, clt, nome, telefone, cpf, email, endereco):
         x = DaoFuncionario.ler()
         listaCpf = list(filter(lambda x: x.cpf == cpf, x))
