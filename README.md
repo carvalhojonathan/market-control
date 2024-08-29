@@ -1,6 +1,6 @@
 # 🛒 Market Control
 
-Sistema para gerenciamento de mercearias com interface em console.
+Sistema para gerenciamento de mercearias com interface via terminal.
 
 ## 📋 Descrição
 
